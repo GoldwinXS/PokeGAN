@@ -500,8 +500,8 @@ AM = AdversarialModel()
 AM.load(version=1)
 AM.model.save('model.h5')
 
-# AM.train_v2(images,
-#          epochs=100000,
-#          batch_size=32,
-#          sample_interval=10,
-#          save_interval=50)
+AM.train_v2(images,
+         epochs=100000,
+         batch_size=32,
+         sample_interval=10,
+         save_interval=50)
