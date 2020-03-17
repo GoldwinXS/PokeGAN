@@ -12,6 +12,7 @@ opencv-python = "*"
 numpy = "*"
 requests = "*"
 beautifulsoup4 = "*"
+pipfile2 = {editable = true,version = "*"}
 
 [requires]
 python_version = "3.7"

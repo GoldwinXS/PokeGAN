@@ -1,9 +1,7 @@
 import cv2,os
-import pandas as pd
+from ProjectUtils import ensure_folder
 import numpy as np
-from keras.models import load_model
 from keras.models import Sequential
-from tqdm import tqdm
 from keras.layers import Dense, \
     Convolution2D,\
     MaxPooling2D,\
@@ -15,12 +13,11 @@ from keras.layers import Dense, \
     Reshape,\
     Flatten,\
     Activation,\
-    LeakyReLU,\
-    Deconvolution2D,ZeroPadding2D
+    ZeroPadding2D
 
 from keras.layers import LeakyReLU
 from keras.initializers import RandomNormal
-from keras.optimizers import RMSprop, Adam, SGD
+from keras.optimizers import  Adam, SGD
 
 """
 
@@ -45,6 +42,11 @@ keras == 2.3.1
 img_dim = 64
 img_dims = (img_dim,img_dim)
 base_path = ''
+ensure_folder(base_path+'GAN_images/')
+ensure_folder(base_path+'models/')
+ensure_folder(base_path+'pokemon/')
+
+
 
 """ Class Setup """
 

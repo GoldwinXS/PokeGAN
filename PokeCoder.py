@@ -105,7 +105,6 @@ def test_auto_encoder():
         cv2.waitKey(5000)
         cv2.destroyAllWindows()
 
-
 # auto_encoder.fit(X,y,epochs=1)
 # auto_encoder.save_weights('models/pokecoder.h5')
 test_auto_encoder()

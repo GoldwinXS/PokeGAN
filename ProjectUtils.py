@@ -1,4 +1,8 @@
+import os
 
+def ensure_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def make_GAN_gif():
@@ -55,4 +59,66 @@ def make_GAN_movie():
                                codec="libx264",
                                audio_codec="aac")
 
-make_GAN_movie()
+def converter(x):
+    #x has shape (batch, width, height, channels)
+    return (0.21 * x[:,:,:,:1]) + (0.72 * x[:,:,:,1:2]) + (0.07 * x[:,:,:,-1:])
+
+
+def load_and_scale_images(path,size=(64,64)):
+    import cv2,os
+    from tqdm import tqdm
+    import numpy as np
+    img_dims = size
+
+    imgs = os.listdir(path)
+    imgs = [img for img in imgs if imgs != '.DS_Store']
+
+    img_data = []
+
+    print('Loading images...')
+    for i,img in enumerate(tqdm(imgs)):
+
+
+        img = cv2.imread(path+img)
+
+        if not isinstance(img,type(None)):
+            corner_color = img[0][0]
+
+
+            fill_val = [0,0,0]
+            img[np.where((img == corner_color).all(axis=2))] = fill_val
+
+
+            x = img.shape[0]
+            y = img.shape[1]
+            if x <= 64 and y<=64:
+                if x > y:
+                    img = cv2.copyMakeBorder(
+                        img,
+                        top=0,
+                        bottom=x-y,
+                        left=0,
+                        right=0,
+                        borderType=cv2.BORDER_CONSTANT,
+                        value=fill_val)
+                elif y>x:
+                    img = cv2.copyMakeBorder(
+                        img,
+                        top=0,
+                        bottom=0,
+                        left=0,
+                        right=y-x,
+                        borderType=cv2.BORDER_CONSTANT,
+                        value=fill_val)
+
+                img = cv2.resize(img,img_dims)
+                img = (img/(255/2))-1 # rescale from [0,255] to [-1,1]
+
+                img_data.append(img)
+
+    print('{} images have been loaded...'.format(len(img_data)))
+
+    return img_data
+
+
+# make_GAN_movie()

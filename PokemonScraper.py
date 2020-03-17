@@ -1,8 +1,10 @@
 import requests
 import bs4,os
+from ProjectUtils import ensure_folder
 
 target_url = 'https://pokemondb.net/sprites/'
 save_folder = 'pokemon/'
+ensure_folder('pokemon/')
 
 # request html from main sprite page
 request = requests.get(target_url,'GET')
