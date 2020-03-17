@@ -3,7 +3,6 @@ from ProjectUtils import ensure_folder
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, \
-    Convolution2D,\
     MaxPooling2D,\
     Conv2D,\
     BatchNormalization,\
@@ -54,10 +53,10 @@ class Generator:
     def __init__(self):
         self.model = Sequential()
         self.lr = 0.0002
-        self.make_model_v4()
+        self.make_model()
 
 
-    def make_model_v4(self):
+    def make_model(self):
 
         self.model.add(Dense(64 * 2 * 2,input_dim=100))
         self.model.add(Activation('tanh'))
@@ -82,98 +81,6 @@ class Generator:
         self.model.add(Activation('tanh'))
 
 
-    def make_model_v3(self):
-
-        # N.B.: this is for a 28x28x3 image
-
-        self.model.add(Dense(128 * 7 * 7,input_dim=100))
-        self.model.add(Activation('tanh'))
-        self.model.add(Dense(128 * 7 * 7))
-
-        self.model.add(BatchNormalization())
-        self.model.add(Activation('tanh'))
-        self.model.add(Reshape((7, 7, 128), input_shape=(128 * 7 * 7,)))
-
-
-        self.model.add(UpSampling2D(size=(2, 2)))
-        self.model.add(Conv2D(64, (5, 5), padding='same'))
-        self.model.add(Activation('tanh'))
-
-        self.model.add(UpSampling2D(size=(2, 2)))
-        self.model.add(Conv2D(3, (5, 5), padding='same'))
-        self.model.add(Activation('tanh'))
-
-        # g_optim = SGD(lr=0.0005, momentum=0.9, nesterov=True)
-        # self.model.compile(loss='binary_crossentropy', optimizer="SGD")
-
-
-    def make_model_v2(self):
-        transforms = 5
-        channels = 3
-        start_dim = 4
-
-        self.model.add(Dense(start_dim * start_dim * (channels**transforms), input_dim=100))
-        self.model.add(BatchNormalization(momentum=0.9))
-        self.model.add(LeakyReLU(alpha=0.3))
-        self.model.add(Reshape((start_dim, start_dim, (channels**transforms))))
-        self.model.add(Dropout(0.4))
-
-        self.model.add(UpSampling2D())
-        self.model.add(Conv2DTranspose(128, 5, padding='same'))
-        self.model.add(BatchNormalization(momentum=0.9))
-        self.model.add(LeakyReLU(alpha=0.3))
-
-        self.model.add(UpSampling2D())
-        self.model.add(Conv2DTranspose(128, 5, padding='same'))
-        self.model.add(BatchNormalization(momentum=0.9))
-        self.model.add(LeakyReLU(alpha=0.3))
-
-        self.model.add(UpSampling2D())
-        self.model.add(Conv2DTranspose(128, 5, padding='same'))
-        self.model.add(BatchNormalization(momentum=0.9))
-        self.model.add(LeakyReLU(alpha=0.3))
-
-        self.model.add(UpSampling2D())
-        self.model.add(Conv2DTranspose(3, 5, padding='same'))
-        self.model.add(Activation('tanh'))
-
-        self.model.compile(loss='binary_crossentropy', optimizer=Adam(lr=self.lr),metrics=['accuracy'])
-        self.model.summary()
-
-    def make_model(self):
-        transforms = 5
-        channels = 3
-        start_dim = 4
-
-        # Starting size
-        self.model.add(Dense(start_dim * start_dim * 256, kernel_initializer=RandomNormal(0, 0.02), input_dim=100))
-        self.model.add(LeakyReLU(0.2))
-        # 4x4x256
-        self.model.add(Reshape((start_dim, start_dim, 256)))
-
-        # 8x8x128
-        self.model.add(Conv2DTranspose(128, (4, 4), strides=2, padding='same', kernel_initializer=RandomNormal(0, 0.02)))
-        self.model.add(LeakyReLU(0.2))
-
-        # 16x16*128
-        self.model.add(Conv2DTranspose(128, (4, 4), strides=2, padding='same', kernel_initializer=RandomNormal(0, 0.02)))
-        self.model.add(LeakyReLU(0.2))
-
-        # 32x32x128
-        self.model.add(Conv2DTranspose(128, (4, 4), strides=2, padding='same', kernel_initializer=RandomNormal(0, 0.02)))
-        self.model.add(LeakyReLU(0.2))
-
-        # 64x64x128
-        self.model.add(Conv2DTranspose(128, (4, 4), strides=2, padding='same', kernel_initializer=RandomNormal(0, 0.02)))
-        self.model.add(LeakyReLU(0.2))
-
-        # 64x64x3
-        self.model.add(Conv2D(channels, (3, 3), padding='same', activation='sigmoid', kernel_initializer=RandomNormal(0, 0.02)))
-
-        self.model.compile(loss='binary_crossentropy', optimizer=Adam(lr=self.lr,),metrics=['accuracy'])
-
-        print('Generator Model')
-        self.model.summary()
 
 
 
@@ -184,9 +91,9 @@ class Discriminator:
         self.img_cols= img_dim
         self.channel= 3
         self.lr = 0.0003
-        self.make_model_v3()
+        self.make_model()
 
-    def make_model_v3(self):
+    def make_model(self):
         self.model.add(
             Conv2D(64, (5, 5),
                    padding='same',
@@ -209,70 +116,6 @@ class Discriminator:
         self.model.add(Dropout(0.3))
         self.model.add(Dense(1))
         self.model.add(Activation('sigmoid'))
-
-    def make_model_v2(self):
-        # self.D = Sequential()
-        depth = 64
-        dropout = 0.4
-        # In: 28 x 28 x 1, depth = 1
-        # Out: 14 x 14 x 1, depth=64
-        input_shape = (img_dim,img_dim,3)
-        self.model.add(Conv2D(depth * 1, 5, strides=2, input_shape=input_shape,padding='same', ))
-        self.model.add(LeakyReLU(alpha=0.3))
-        self.model.add(Dropout(dropout))
-
-        self.model.add(Conv2D(depth * 2, 5, strides=2, padding='same'))
-        self.model.add(LeakyReLU(alpha=0.3))
-        self.model.add(Dropout(dropout))
-
-        self.model.add(Conv2D(depth * 4, 5, strides=2, padding='same',))
-        self.model.add(LeakyReLU(alpha=0.3))
-        self.model.add(Dropout(dropout))
-
-        self.model.add(Conv2D(depth * 8, 5, strides=1, padding='same',))
-        self.model.add(LeakyReLU(alpha=0.3))
-        self.model.add(Dropout(dropout))
-
-        self.model.add(Flatten())
-        self.model.add(Dense(1))
-        self.model.add(Activation('sigmoid'))
-
-        self.model.compile(loss='binary_crossentropy', optimizer=Adam(lr=self.lr,beta_1=0.5),metrics=['accuracy'])
-
-        self.model.summary()
-
-    def make_model(self):
-
-        img_shape = (img_dim,img_dim,3)
-        self.kernel_size = 5
-
-        self.model.add(Conv2D(32, kernel_size=self.kernel_size, strides=2, input_shape=img_shape, padding="same"))  # 192x256 -> 96x128
-        self.model.add(LeakyReLU(alpha=0.2))
-        self.model.add(Dropout(0.25))
-
-        self.model.add(Conv2D(64, kernel_size=self.kernel_size, strides=2, padding="same"))  # 96x128 -> 48x64
-        self.model.add(ZeroPadding2D(padding=((0, 1), (0, 1))))
-        self.model.add(LeakyReLU(alpha=0.2))
-        self.model.add(Dropout(0.25))
-        self.model.add(BatchNormalization(momentum=0.8))
-
-        self.model.add(Conv2D(128, kernel_size=self.kernel_size, strides=2, padding="same"))  # 48x64 -> 24x32
-        self.model.add(LeakyReLU(alpha=0.2))
-        self.model.add(Dropout(0.25))
-        self.model.add(BatchNormalization(momentum=0.8))
-
-        self.model.add(Conv2D(256, kernel_size=self.kernel_size, strides=1, padding="same"))  # 24x32 -> 12x16
-        self.model.add(LeakyReLU(alpha=0.2))
-        self.model.add(Dropout(0.25))
-
-        self.model.add(Conv2D(512, kernel_size=self.kernel_size, strides=1, padding="same"))  # 12x16 -> 6x8
-        self.model.add(LeakyReLU(alpha=0.2))
-        self.model.add(Dropout(0.25))
-
-        self.model.add(Flatten())
-        self.model.add(Dense(1, activation='sigmoid'))
-
-
 
 class AdversarialModel:
     def __init__(self):
@@ -337,51 +180,6 @@ class AdversarialModel:
         return final_img
 
     def train(self,images, epochs, batch_size=128, sample_interval=50,save_interval =100):
-        X_train = np.array(images)
-        valid = np.zeros((batch_size, 1))
-        fake = np.ones((batch_size, 1))
-
-        for epoch in range(epochs):
-            idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx]
-            noise = np.random.normal(0, 1, (batch_size, 100))
-            gen_imgs = self.generator.model.predict(noise)
-            d_loss_real = self.discriminator.model.train_on_batch(imgs, valid) # real pokemon images
-            d_loss_fake = self.discriminator.model.train_on_batch(gen_imgs, fake) # "fake" images
-            d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
-
-            noise = np.random.normal(0, 1, (batch_size, 100))
-            g_loss = self.model.train_on_batch(noise, valid)
-
-            text = "%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100 * d_loss[1], g_loss[0])
-            print(text)
-
-
-            if epoch % sample_interval == 0:
-
-                img = self.generator.model.predict(self.test_noise)
-
-
-                final_img = self.assemble_images(img)
-                final_img = (final_img +1)/2 # move range to [0,1]
-
-                n_images = len(os.listdir('drive/My Drive/Colab Notebooks/GAN_images'))
-
-                display_scale =3
-                final_img = cv2.resize(final_img,(final_img.shape[1]*display_scale,final_img.shape[0]*display_scale))
-
-
-
-
-                final_img = final_img*255 # move range to [0,255]
-                cv2.imwrite('drive/My Drive/Colab Notebooks/GAN_images/'+str(n_images)+'.png',final_img)
-
-
-            if epoch % save_interval == 0:
-                print('Save interval reached. Saving models...')
-                self.save()
-
-    def train_v2(self,images, epochs, batch_size=128, sample_interval=50,save_interval =100):
         X_train = np.array(images) # convert list of images to numpy arr
 
 
@@ -500,7 +298,7 @@ AM = AdversarialModel()
 AM.load(version=1)
 AM.model.save('model.h5')
 
-AM.train_v2(images,
+AM.train(images,
          epochs=100000,
          batch_size=32,
          sample_interval=10,
