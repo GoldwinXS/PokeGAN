@@ -8,8 +8,6 @@ This simply GAN ended up working, but I believe it is a bit overfit since one ca
 A video of the training process can be found at rthe link below. Each second is 24 frames, and each frame is from 1/10 training epochs. The resulting footage is relatively smooth but can be a bit flashy:
 https://www.youtube.com/watch?v=ClJe2RUw26A
 
-<iframe  title="YouTube video player" width="480" height="390" src="https://www.youtube.com/watch?v=ClJe2RUw26A" frameborder="0" allowfullscreen></iframe>
-
 
 ## Linux/Mac Environment Setup ##
 - Get virtualenv with: <code>pip3 install virtualenv</code> This should add virtualenv to the system. 
