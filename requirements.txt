@@ -23,7 +23,7 @@ matplotlib==3.2.0
 more-itertools==8.1.0
 murmurhash==1.0.2
 numpy==1.18.1
-opencv-contrib-python==4.1.2.30
+opencv-contrib-python==4.2.0.32
 opencv-python>=2.4.9
 opt-einsum==3.1.0
 pandas==1.0.1
